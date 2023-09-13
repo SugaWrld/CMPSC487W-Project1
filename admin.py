@@ -290,14 +290,21 @@ def new_window(windowName, dataList, label):
         window,
         textvariable=searchDate
     ).place(x=x+50, y=0)
-    def filterByDateAndTime():
+    def filtered():
+        if(userType.get() != None and userType.get() != "Select"):
+            filteredType = filterByType()
+            filterByDateAndTime(filteredType)
+        else: filterByDateAndTime(dataList)
+        
+    def filterByDateAndTime(dataList):
         if(searchDate != None and len(searchDate.get())>0):
-            newList = searchByDate()
+            newList = searchByDate(dataList)
             if(startTime.get()!='Time' and endTime.get!='Time'): timeRange(f"Logs From Date: {searchDate.get()}",newList)
             else: new_window(f"Logs From Date: {searchDate.get()}", newList, label)
         elif(startTime.get()!='Time' and endTime.get!='Time'): timeRange(windowName,dataList)
+        else: new_window(f"{windowName} Filtered By Type: {userType.get()}", dataList, label)
 
-    def searchByDate():
+    def searchByDate(dataList):
         filteredList = [sublist for sublist in dataList if str(sublist[3].date())==searchDate.get()]
         return filteredList 
     
@@ -309,8 +316,19 @@ def new_window(windowName, dataList, label):
     filter_Btn = ttk.Button(
         window,
         text='Filter',
-        command=filterByDateAndTime
-    ).place(x=x+500, y=0)
+        command=filtered
+    ).place(x=x+300, y=0)
+
+    #Filter by type
+    dropDown(window, ['Select', 'student', 'faculty member', 'staff member', 'janitor'], userType, x+500, 0)
+    def filterByType():
+        filteredList = [sublist for sublist in dataList if sublist[2]==userType.get()]
+        if(filteredList != None and len(filteredList)>0):
+            #new_window(f"{windowName} Filtered By Type: {userType.get()}", filteredList, label)
+            return filteredList
+        else: 
+            displayError(f"User type: {userType.get()}, does't exist in this table!")
+            return None
 
     displayData(window,dataList, label)
     window.focus()
